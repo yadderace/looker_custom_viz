@@ -4,17 +4,15 @@ looker.plugins.visualizations.add({
     // form within the admin/visualizations page of Looker
     id: "treemap_apexcharts",
     label: "Treemap Apexcharts",
+    
     options: {
-      font_size: {
-        type: "string",
-        label: "Font Size",
-        values: [
-          {"Large": "large"},
-          {"Small": "small"}
-        ],
-        display: "radio",
-        default: "large"
+      show_legend: {
+        type: "boolean",
+        label: "Show Legend",
+        default: "false",
+        section: "Plot"
       }
+
     },
 
 
@@ -84,7 +82,10 @@ looker.plugins.visualizations.add({
       },
       chart: {
         height: 350,
-        type: 'treemap'
+        type: 'treemap',
+        toolbar: {
+          show: false
+        }
       },
       title: {
         text: 'Multi-dimensional Treemap',
