@@ -94,7 +94,7 @@ looker.plugins.visualizations.add({
 
       var chart = new ApexCharts(element.querySelector("#chart"), options);
       chart.render();
-      doneRendering()
+      //doneRendering();
     }
   });
   
