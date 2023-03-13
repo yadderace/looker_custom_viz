@@ -12,7 +12,6 @@ looker.plugins.visualizations.add({
         default: "false",
         section: "Plot"
       }
-
     },
 
 
@@ -27,6 +26,22 @@ looker.plugins.visualizations.add({
   
       // Clear any errors from previous updates
       this.clearErrors();
+
+      // Validating fields
+      if(queryResponse.fields.dimensions.length != 2){
+        this.addError({
+          title: "Two Dimensions Required",
+          message: "This visualization requires two dimensions"
+        });
+        return;
+      } else if(queryResponse.length != 1){
+        this.addError({
+          title: "One Measure Required",
+          message: "This visualization requires one measure"
+        });
+        return;
+      }
+      
 
       var options = {
         series: [
@@ -78,7 +93,7 @@ looker.plugins.visualizations.add({
         }
       ],
         legend: {
-        show: false
+        show: config.show_legend
       },
       chart: {
         height: 350,
@@ -86,10 +101,6 @@ looker.plugins.visualizations.add({
         toolbar: {
           show: false
         }
-      },
-      title: {
-        text: 'Multi-dimensional Treemap',
-        align: 'center'
       }
       };
 
