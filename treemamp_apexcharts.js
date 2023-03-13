@@ -34,7 +34,7 @@ looker.plugins.visualizations.add({
           message: "This visualization requires two dimensions"
         });
         return;
-      } else if(queryResponse.length != 1){
+      } else if(queryResponse.fields.measures.length != 1){
         this.addError({
           title: "One Measure Required",
           message: "This visualization requires one measure"
