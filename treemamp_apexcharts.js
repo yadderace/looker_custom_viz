@@ -1,3 +1,4 @@
+
 looker.plugins.visualizations.add({
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
@@ -42,66 +43,24 @@ looker.plugins.visualizations.add({
         return;
       }
       
+      // Transforming data
+      const measure_name = queryResponse.fields.measures[0].name;
+      const dimension_color = queryResponse.fields.dimensions[0].name;
+      const dimension_label = queryResponse.fields.dimensions[1].name;
+      var series_apexchart = transform_data_to_treemap(data, measure_name, dimension_color, dimension_label);
 
       var options = {
-        series: [
-        {
-          name: 'Desktops',
-          data: [
-            {
-              x: 'ABC',
-              y: 10
-            },
-            {
-              x: 'DEF',
-              y: 60
-            },
-            {
-              x: 'XYZ',
-              y: 41
-            }
-          ]
-        },
-        {
-          name: 'Mobile',
-          data: [
-            {
-              x: 'ABCD',
-              y: 10
-            },
-            {
-              x: 'DEFG',
-              y: 20
-            },
-            {
-              x: 'WXYZ',
-              y: 51
-            },
-            {
-              x: 'PQR',
-              y: 30
-            },
-            {
-              x: 'MNO',
-              y: 20
-            },
-            {
-              x: 'CDE',
-              y: 30
-            }
-          ]
-        }
-      ],
+        series: series_apexchart,
         legend: {
-        show: config.show_legend
-      },
-      chart: {
-        height: 350,
-        type: 'treemap',
-        toolbar: {
-          show: false
+          show: config.show_legend
+        },
+        chart: {
+          height: 350,
+          type: 'treemap',
+          toolbar: {
+            show: false
+          }
         }
-      }
       };
 
       var chart = new ApexCharts(element.querySelector("#chart"), options);
@@ -110,4 +69,31 @@ looker.plugins.visualizations.add({
       done();
     }
   });
+
+
+  const transform_data_to_treemap = function (data, measure_name, dimension_color, dimension_label){
+  
+    var series = {};
+    data.forEach(row => {
+        var dim_color_value = String(row[dimension_color].value)
+        
+        var data_point = {
+            x: String(row[dimension_label].value),
+            y: row[measure_name].value
+        };
+        
+        if(!(dim_color_value in series)) {  
+            series[dim_color_value] = {
+                name: dim_color_value,
+                data: [data_point]
+            };
+        }
+        else{
+            series[dim_color_value].data.push(data_point);
+        }
+        
+    });
+  
+    return Object.values(series);
+  }
   
