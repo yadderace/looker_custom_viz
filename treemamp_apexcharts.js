@@ -19,6 +19,13 @@ looker.plugins.visualizations.add({
         label: "Fill Color As Stroke",
         default: "false",
         section: "Plot"
+      },
+
+      color_range: {
+        type: 'array',
+        label: 'Color Range',
+        display: 'colors',
+        default: ['#dd3333', '#80ce5d', '#f78131', '#369dc1', '#c572d3', '#36c1b3', '#b57052', '#ed69af']
       }
     },
 
@@ -62,6 +69,8 @@ looker.plugins.visualizations.add({
       var options = {
         
         series: series_apexchart,
+
+        colors: config.color_range
         
         legend: {
           show: config.show_legend
