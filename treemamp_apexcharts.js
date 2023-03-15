@@ -12,6 +12,13 @@ looker.plugins.visualizations.add({
         label: "Show Legend",
         default: "false",
         section: "Plot"
+      },
+
+      fill_color_as_stroke: {
+        type: "boolean",
+        label: "Fill Color As Stroke",
+        default: "false",
+        section: "Plot"
       }
     },
 
@@ -50,20 +57,32 @@ looker.plugins.visualizations.add({
       const dimension_label = queryResponse.fields.dimensions[1].name;
       var series_apexchart = transform_data_to_treemap(data, measure_name, dimension_color, dimension_label);
 
+
+      // Setting data and configuration for the chart
       var options = {
+        
         series: series_apexchart,
+        
         legend: {
           show: config.show_legend
         },
+        
         chart: {
           height: 350,
           type: 'treemap',
           toolbar: {
             show: false
           }
+        },
+
+        plotOptions: {
+          treemap:{
+            useFillColorAsStroke: config.fill_color_as_stroke
+          }
         }
       };
 
+      // Rendering the chart
       var chart = new ApexCharts(element.querySelector("#chart"), options);
       chart.render();
       done();
