@@ -19,7 +19,7 @@ looker.plugins.visualizations.add({
     // Set up the initial state of the visualization
     create: function(element, config) {
   
-        element.innerHTML = "<div id='chart'></div>";
+        create_div(element);
   
     },
     // Render in response to the data or settings changing
@@ -27,6 +27,7 @@ looker.plugins.visualizations.add({
   
       // Clear any errors from previous updates
       this.clearErrors();
+      create_div(element);
 
       // Validating fields
       if(queryResponse.fields.dimensions.length != 2){
@@ -65,35 +66,41 @@ looker.plugins.visualizations.add({
 
       var chart = new ApexCharts(element.querySelector("#chart"), options);
       chart.render();
-      console.log(chart);
       done();
     }
-  });
-
-
-  const transform_data_to_treemap = function (data, measure_name, dimension_color, dimension_label){
-  
-    var series = {};
-    data.forEach(row => {
-        var dim_color_value = String(row[dimension_color].value)
-        
-        var data_point = {
-            x: String(row[dimension_label].value),
-            y: row[measure_name].value
-        };
-        
-        if(!(dim_color_value in series)) {  
-            series[dim_color_value] = {
-                name: dim_color_value,
-                data: [data_point]
-            };
-        }
-        else{
-            series[dim_color_value].data.push(data_point);
-        }
-        
-    });
-  
-    return Object.values(series);
   }
+);
+
+const DIV_ID = 'chart';
+
+const transform_data_to_treemap = function (data, measure_name, dimension_color, dimension_label){
   
+  var series = {};
+  data.forEach(row => {
+    
+    var dim_color_value = String(row[dimension_color].value)
+    var data_point = {
+      x: String(row[dimension_label].value),
+      y: row[measure_name].value
+    };
+    
+    if(!(dim_color_value in series)) {  
+      series[dim_color_value] = {
+        name: dim_color_value,
+        data: [data_point]
+      };
+    }
+    else{
+      series[dim_color_value].data.push(data_point);
+    }
+        
+  });
+  
+  return Object.values(series);
+
+}
+
+const create_div = function(element){
+  element.innerHTML = "";
+  element.innerHTML = "<div id='" + DIV_ID + "'></div>";
+}
