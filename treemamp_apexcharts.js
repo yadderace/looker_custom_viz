@@ -70,7 +70,7 @@ looker.plugins.visualizations.add({
         
         series: series_apexchart,
 
-        colors: config.color_range
+        colors: config.color_range,
         
         legend: {
           show: config.show_legend
