@@ -111,8 +111,6 @@ looker.plugins.visualizations.add({
       this.clearErrors();
       create_div(element);
 
-      var options = create_options(queryResponse);
-
       // Validating fields
       if(queryResponse.fields.dimensions.length != 2){
         this.addError({
@@ -129,7 +127,7 @@ looker.plugins.visualizations.add({
       }
 
       // Creating options from data
-      var options = create_options(queryResponse);
+      var options = create_dynamic_options(queryResponse);
       this.trigger('registerOptions', options);
       
       // Transforming data
