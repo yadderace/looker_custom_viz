@@ -6,29 +6,7 @@ looker.plugins.visualizations.add({
     id: "treemap_apexcharts",
     label: "Treemap Apexcharts",
     
-    options: {
-      show_legend: {
-        type: "boolean",
-        label: "Show Legend",
-        default: "false",
-        section: "Plot"
-      },
-
-      fill_color_as_stroke: {
-        type: "boolean",
-        label: "Fill Color As Stroke",
-        default: "false",
-        section: "Plot"
-      },
-
-      color_range: {
-        type: 'array',
-        label: 'Color Range',
-        display: 'colors',
-        default: ['#dd3333', '#80ce5d', '#f78131', '#369dc1', '#c572d3', '#36c1b3', '#b57052', '#ed69af'],
-        section: "Plot"
-      }
-    },
+    options: create_fixed_options(),
 
 
     // Set up the initial state of the visualization
@@ -44,6 +22,8 @@ looker.plugins.visualizations.add({
       this.clearErrors();
       create_div(element);
 
+      var options = create_options(queryResponse);
+
       // Validating fields
       if(queryResponse.fields.dimensions.length != 2){
         this.addError({
@@ -58,6 +38,10 @@ looker.plugins.visualizations.add({
         });
         return;
       }
+
+      // Creating options from data
+      var options = create_options(queryResponse);
+      this.trigger('registerOptions', options);
       
       // Transforming data
       const measure_name = queryResponse.fields.measures[0].name;
@@ -132,4 +116,58 @@ const transform_data_to_treemap = function (data, measure_name, dimension_color,
 const create_div = function(element){
   element.innerHTML = "";
   element.innerHTML = "<div id='" + DIV_ID + "'></div>";
+}
+
+const create_fixed_options = function(){
+  return {
+    show_legend: {
+      type: "boolean",
+      label: "Show Legend",
+      default: "false",
+      order: 1,
+      section: "Plot"
+    },
+
+    fill_color_as_stroke: {
+      type: "boolean",
+      label: "Fill Color As Stroke",
+      default: "false",
+      order: 2,
+      section: "Plot"
+    },
+
+    color_range: {
+      type: 'array',
+      label: 'Color Range',
+      display: 'colors',
+      order: 3,
+      default: ['#dd3333', '#80ce5d', '#f78131', '#369dc1', '#c572d3', '#36c1b3', '#b57052', '#ed69af'],
+      section: "Plot"
+    }
+  };
+}
+
+const create_dynamic_options = function(queryResponse){
+  var options = {};
+
+  var no_hidden_measures = [];
+  queryResponse.fields.measures.forEach(function(measure){
+    if(!measure.hidden){
+      var obj = {};
+      obj[measure.label] = measure.name; 
+      no_hidden_measures.push(obj);
+    }
+  });
+
+  options['area_measure'] = {
+    label: 'Area Measure',
+    type: 'string',
+    order: 4,
+    display: 'select',
+    section: 'Plot',
+    values: no_hidden_measures,
+    default: no_hidden_measures[0].label
+  }
+  
+  return options;
 }
