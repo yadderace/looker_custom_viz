@@ -180,7 +180,7 @@ looker.plugins.visualizations.add({
         },
         
         chart: {
-          height: document.getElementById(DIV_ID).offsetHeight * 0.90,
+          height: element.offsetHeight * 0.80,
           type: 'treemap',
           toolbar: {
             show: false
