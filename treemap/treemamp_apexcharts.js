@@ -69,7 +69,7 @@ const create_dynamic_options = function(queryResponse){
 
   var no_hidden_dimensions = [];
   queryResponse.fields.dimensions.forEach(function(dimension){
-    if(!dimension.hideen){
+    if(!dimension.hidden){
       var obj = {};
       obj[dimension.label] = dimension.name;
       no_hidden_dimensions.push(obj);
