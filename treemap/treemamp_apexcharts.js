@@ -63,7 +63,8 @@ const create_fixed_options = function(){
 }
 
 const create_dynamic_options = function(queryResponse){
-  var options = {};
+  
+  var options = create_fixed_options();
 
   var no_hidden_measures = [];
   queryResponse.fields.measures.forEach(function(measure){
@@ -81,7 +82,7 @@ const create_dynamic_options = function(queryResponse){
     display: 'select',
     section: 'Plot',
     values: no_hidden_measures,
-    default: no_hidden_measures[0].label
+    default: Object.values(no_hidden_measures[0])[0]
   }
   
   return options;
@@ -118,10 +119,10 @@ looker.plugins.visualizations.add({
           message: "This visualization requires two dimensions"
         });
         return;
-      } else if(queryResponse.fields.measures.length != 1){
+      } else if(queryResponse.fields.measures.length == 0){
         this.addError({
           title: "One Measure Required",
-          message: "This visualization requires one measure"
+          message: "This visualization requires at least one measure"
         });
         return;
       }
@@ -131,7 +132,7 @@ looker.plugins.visualizations.add({
       this.trigger('registerOptions', options);
       
       // Transforming data
-      const measure_name = queryResponse.fields.measures[0].name;
+      const measure_name = config.area_measure;
       const dimension_color = queryResponse.fields.dimensions[0].name;
       const dimension_label = queryResponse.fields.dimensions[1].name;
       var series_apexchart = transform_data_to_treemap(data, measure_name, dimension_color, dimension_label);
