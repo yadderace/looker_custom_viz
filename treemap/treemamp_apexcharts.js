@@ -1,6 +1,7 @@
 
 const DIV_ID = 'chart';
 
+
 const transform_data_to_treemap = function (data, measure_name, dimension_color, dimension_label){
   
   var series = {};
@@ -75,6 +76,15 @@ const create_dynamic_options = function(queryResponse){
     }
   });
 
+  var no_hidden_dimensions = [];
+  queryResponse.fields.dimensions.forEach(function(dimension){
+    if(!dimension.hideen){
+      var obj = {};
+      obj[dimension.label] = dimension.name;
+      no_hidden_dimensions.push(obj);
+    }
+  });
+
   options['area_measure'] = {
     label: 'Area Measure',
     type: 'string',
@@ -84,7 +94,27 @@ const create_dynamic_options = function(queryResponse){
     values: no_hidden_measures,
     default: Object.values(no_hidden_measures[0])[0]
   }
-  
+
+  options['category_dimension'] = {
+    label: 'Category Dimension',
+    type: 'string',
+    order: 5,
+    display: 'select',
+    section: 'Plot',
+    values: no_hidden_dimensions,
+    default: Object.values(no_hidden_dimensions[0])[0]
+  }
+
+  options['subcategory_dimension'] = {
+    label: 'Sub-Category Dimension',
+    type: 'string',
+    order: 5,
+    display: 'select',
+    section: 'Plot',
+    values: no_hidden_dimensions,
+    default: Object.values(no_hidden_dimensions[0])[1]
+  }
+
   return options;
 }
 
@@ -132,9 +162,9 @@ looker.plugins.visualizations.add({
       this.trigger('registerOptions', options);
       
       // Transforming data
-      const measure_name = config.area_measure;
-      const dimension_color = queryResponse.fields.dimensions[0].name;
-      const dimension_label = queryResponse.fields.dimensions[1].name;
+      const measure_name = config.area_measure || queryResponse.fields.measures[0].name;
+      const dimension_color = config.category_dimension || queryResponse.fields.dimensions[0].name;
+      const dimension_label = config.subcategory_dimension || queryResponse.fields.dimensions[1].name;
       var series_apexchart = transform_data_to_treemap(data, measure_name, dimension_color, dimension_label);
 
 
@@ -150,7 +180,7 @@ looker.plugins.visualizations.add({
         },
         
         chart: {
-          height: 350,
+          height: document.getElementById(DIV_ID).offsetHeight * 0.90,
           type: 'treemap',
           toolbar: {
             show: false
@@ -165,7 +195,7 @@ looker.plugins.visualizations.add({
       };
 
       // Rendering the chart
-      var chart = new ApexCharts(element.querySelector("#chart"), options);
+      var chart = new ApexCharts(element.querySelector("#" + DIV_ID), options);
       chart.render();
       done();
     }
