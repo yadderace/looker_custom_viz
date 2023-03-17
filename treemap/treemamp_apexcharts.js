@@ -67,15 +67,6 @@ const create_dynamic_options = function(queryResponse){
   
   var options = create_fixed_options();
 
-  var no_hidden_measures = [];
-  queryResponse.fields.measures.forEach(function(measure){
-    if(!measure.hidden){
-      var obj = {};
-      obj[measure.label] = measure.name; 
-      no_hidden_measures.push(obj);
-    }
-  });
-
   var no_hidden_dimensions = [];
   queryResponse.fields.dimensions.forEach(function(dimension){
     if(!dimension.hideen){
@@ -85,12 +76,29 @@ const create_dynamic_options = function(queryResponse){
     }
   });
 
+  var no_hidden_measures = [];
+  queryResponse.fields.measures.forEach(function(measure){
+    if(!measure.hidden){
+      var obj = {};
+      obj[measure.label] = measure.name; 
+      no_hidden_measures.push(obj);
+    }
+  });
+
+  queryResponse.fields.table_calculations.forEach(function(calculation){
+    if(!calculation.hidden && calculation.type == 'number'){
+      var obj = {};
+      obj[calculation.label] == calculation.name;
+      no_hidden_measures.push(obj);
+    }
+  });
+
   options['area_measure'] = {
     label: 'Area Measure',
     type: 'string',
-    order: 4,
+    order: 1,
     display: 'select',
-    section: 'Plot',
+    section: 'Data',
     values: no_hidden_measures,
     default: Object.values(no_hidden_measures[0])[0]
   }
@@ -98,9 +106,9 @@ const create_dynamic_options = function(queryResponse){
   options['category_dimension'] = {
     label: 'Category Dimension',
     type: 'string',
-    order: 5,
+    order: 2,
     display: 'select',
-    section: 'Plot',
+    section: 'Data',
     values: no_hidden_dimensions,
     default: Object.values(no_hidden_dimensions[0])[0]
   }
@@ -108,9 +116,9 @@ const create_dynamic_options = function(queryResponse){
   options['subcategory_dimension'] = {
     label: 'Sub-Category Dimension',
     type: 'string',
-    order: 5,
+    order: 3,
     display: 'select',
-    section: 'Plot',
+    section: 'Data',
     values: no_hidden_dimensions,
     default: Object.values(no_hidden_dimensions[0])[1]
   }
@@ -180,7 +188,7 @@ looker.plugins.visualizations.add({
         },
         
         chart: {
-          height: element.offsetHeight * 0.80,
+          height: element.offsetHeight,
           type: 'treemap',
           toolbar: {
             show: false
