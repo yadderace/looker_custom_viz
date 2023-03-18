@@ -1,6 +1,44 @@
 
 const DIV_ID = 'chart';
 
+const validate_errors = function(queryResponse){
+  
+  var result = {
+    error: false,
+    title: null,
+    message: null,
+    qty_no_hidden_dimensions: 0,
+    qty_no_hidden_measures: 0
+  };
+
+  queryResponse.fields.dimensions.forEach(function(dimension){
+    if(!dimension.hidden) result.qty_no_hidden_dimensions++;
+  });
+
+  queryResponse.fields.measures.forEach(function(measure){
+    if(!measure.hidden) result.qty_no_hidden_measures++;
+  });
+
+  queryResponse.fields.table_calculations.forEach(function(calculation){
+    if(!calculation.hidden && calculation.type == 'number') qty_no_hidden_measures++;
+  });
+
+  if(result.qty_no_hidden_dimensions ==  0){
+    result.error = true;
+    result.title = 'One Dimension Required';
+    result.message = 'This chart requires at least one dimension';
+    return result;
+  }
+
+  if(result.qty_no_hidden_measures ==  0){
+    result.error = true;
+    result.title = 'One Measure Required';
+    result.message = 'This chart requires at least one measure';
+    return result;
+  }
+
+  return result;
+}
 
 const transform_data_to_treemap = function (data, measure_name, dimension_color, dimension_label){
   
@@ -88,7 +126,7 @@ const create_dynamic_options = function(queryResponse){
   queryResponse.fields.table_calculations.forEach(function(calculation){
     if(!calculation.hidden && calculation.type == 'number'){
       var obj = {};
-      obj[calculation.label] == calculation.name;
+      obj['(TC)' + calculation.label] == calculation.name;
       no_hidden_measures.push(obj);
     }
   });
@@ -150,17 +188,13 @@ looker.plugins.visualizations.add({
       this.clearErrors();
       create_div(element);
 
+      
+      const validation_result = validate_errors(queryResponse);
       // Validating fields
-      if(queryResponse.fields.dimensions.length != 2){
+      if(validation_result.error){
         this.addError({
-          title: "Two Dimensions Required",
-          message: "This visualization requires two dimensions"
-        });
-        return;
-      } else if(queryResponse.fields.measures.length == 0){
-        this.addError({
-          title: "One Measure Required",
-          message: "This visualization requires at least one measure"
+          title: validation_result.title,
+          message: validation_result.message
         });
         return;
       }
