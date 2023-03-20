@@ -21,7 +21,7 @@ const validate_errors = function(queryResponse){
   });
 
   queryResponse.fields.table_calculations.forEach(function(calculation){
-    if(!calculation.hidden && calculation.type == 'number') qty_no_hidden_measures++;
+    if(!calculation.hidden && calculation.type == 'number') result.qty_no_hidden_measures++;
   });
 
   if(result.qty_no_hidden_dimensions ==  0){
@@ -238,7 +238,8 @@ looker.plugins.visualizations.add({
 
         plotOptions: {
           treemap:{
-            useFillColorAsStroke: config.fill_color_as_stroke
+            useFillColorAsStroke: config.fill_color_as_stroke,
+            distributed: !IS_MULTIDIMENSIONAL // If it's unidimensional then we want a disitributed palette.
           }
         }
       };
