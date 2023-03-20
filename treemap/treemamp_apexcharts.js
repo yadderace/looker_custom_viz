@@ -126,7 +126,7 @@ const create_dynamic_options = function(queryResponse){
   queryResponse.fields.table_calculations.forEach(function(calculation){
     if(!calculation.hidden && calculation.type == 'number'){
       var obj = {};
-      obj['(TC)' + calculation.label] == calculation.name;
+      obj[calculation.label] = calculation.name;
       no_hidden_measures.push(obj);
     }
   });
