@@ -213,7 +213,7 @@ looker.plugins.visualizations.add({
       // Transforming data
       const measure_name = config.area_measure || queryResponse.fields.measures[0].name;
       const dimension_color = config.category_dimension || queryResponse.fields.dimensions[0].name;
-      const dimension_label = config.subcategory_dimension || queryResponse.fields.dimensions[1].name;
+      const dimension_label = IS_MULTIDIMENSIONAL ? config.subcategory_dimension || queryResponse.fields.dimensions[1].name: null;
       var series_apexchart = transform_data_to_treemap(data, measure_name, dimension_color, dimension_label);
 
 
