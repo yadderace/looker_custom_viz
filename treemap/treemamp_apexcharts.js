@@ -1,3 +1,4 @@
+var IS_MULTIDIMENSIONAL = false;
 
 const DIV_ID = 'chart';
 
@@ -45,9 +46,9 @@ const transform_data_to_treemap = function (data, measure_name, dimension_color,
   var series = {};
   data.forEach(row => {
     
-    var dim_color_value = String(row[dimension_color].value)
+    var dim_color_value = (dimension_label == null) ? 'null' : String(row[dimension_color].value);
     var data_point = {
-      x: String(row[dimension_label].value),
+      x: String(row[dimension_label || dimension_color].value),
       y: row[measure_name].value
     };
     
@@ -62,7 +63,9 @@ const transform_data_to_treemap = function (data, measure_name, dimension_color,
     }
         
   });
-  
+
+  if(dimension_label == null) delete series['null'].name;
+
   return Object.values(series);
 
 }
@@ -150,15 +153,17 @@ const create_dynamic_options = function(queryResponse){
     values: no_hidden_dimensions,
     default: Object.values(no_hidden_dimensions[0])[0]
   }
-
-  options['subcategory_dimension'] = {
-    label: 'Sub-Category Dimension',
-    type: 'string',
-    order: 3,
-    display: 'select',
-    section: 'Data',
-    values: no_hidden_dimensions,
-    default: Object.values(no_hidden_dimensions[0])[1]
+  
+  if(IS_MULTIDIMENSIONAL){
+    options['subcategory_dimension'] = {
+      label: 'Sub-Category Dimension',
+      type: 'string',
+      order: 3,
+      display: 'select',
+      section: 'Data',
+      values: no_hidden_dimensions,
+      default: Object.values(no_hidden_dimensions[0])[1]
+    }
   }
 
   return options;
@@ -188,7 +193,7 @@ looker.plugins.visualizations.add({
       this.clearErrors();
       create_div(element);
 
-      
+      IS_MULTIDIMENSIONAL = false;
       const validation_result = validate_errors(queryResponse);
       // Validating fields
       if(validation_result.error){
@@ -198,6 +203,8 @@ looker.plugins.visualizations.add({
         });
         return;
       }
+
+      IS_MULTIDIMENSIONAL = (validation_result.qty_no_hidden_dimensions > 1)
 
       // Creating options from data
       var options = create_dynamic_options(queryResponse);
