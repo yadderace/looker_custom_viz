@@ -2,6 +2,7 @@ var IS_MULTIDIMENSIONAL = false;
 
 const DIV_ID = 'chart';
 
+
 const validate_errors = function(queryResponse){
   
   var result = {
@@ -41,6 +42,7 @@ const validate_errors = function(queryResponse){
   return result;
 }
 
+
 const transform_data_to_treemap = function (data, measure_name, dimension_color, dimension_label){
   
   var series = {};
@@ -70,10 +72,12 @@ const transform_data_to_treemap = function (data, measure_name, dimension_color,
 
 }
 
+
 const create_div = function(element){
   element.innerHTML = "";
   element.innerHTML = "<div id='" + DIV_ID + "'></div>";
 }
+
 
 const create_fixed_options = function(){
   return {
@@ -103,6 +107,7 @@ const create_fixed_options = function(){
     }
   };
 }
+
 
 const create_dynamic_options = function(queryResponse){
   
@@ -170,6 +175,24 @@ const create_dynamic_options = function(queryResponse){
 }
 
 
+const update_config_options = function(options, config){
+  if( !'area_measure' in config || !'category_dimension' in config || (IS_MULTIDIMENSIONAL && !'subcategory_dimension' in config)) return;
+
+  // If any of dimensions/measure selected in config is not available in options then it updates it to default.
+  
+  if(!options.area_measure.values.flatMap(option => Object.values(option)).includes(config.area_measure)){
+    config.area_measure = options.area_measure.default
+  }
+
+  if(!options.category_dimension.values.flatMap(option => Object.values(option)).includes(config.category_dimension)){
+    config.category_dimension = options.category_dimension.default
+  }
+
+  if(IS_MULTIDIMENSIONAL && !options.subcategory_dimension.values.flatMap(option => Object.values(option)).includes(config.subcategory_dimension)){
+    config.subcategory_dimension = options.subcategory_dimension.default
+  }
+}
+
 looker.plugins.visualizations.add({
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
@@ -209,6 +232,7 @@ looker.plugins.visualizations.add({
       // Creating options from data
       var options = create_dynamic_options(queryResponse);
       this.trigger('registerOptions', options);
+      update_config_options(options, config);
       
       // Transforming data
       const measure_name = config.area_measure || queryResponse.fields.measures[0].name;
