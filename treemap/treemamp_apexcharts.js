@@ -2,6 +2,8 @@ var IS_MULTIDIMENSIONAL = false;
 
 const DIV_ID = 'chart';
 
+var myCustomChart = null;
+
 
 const validate_errors = function(queryResponse){
   
@@ -207,6 +209,7 @@ looker.plugins.visualizations.add({
     create: function(element, config) {
   
         create_div(element);
+        myCustomChart = LookerCharts.createVisualization(element, config);
   
     },
     // Render in response to the data or settings changing
@@ -235,7 +238,7 @@ looker.plugins.visualizations.add({
       
       // Updating config
       update_config_options(options, config);
-      LookerCharts.updateConfig(config);
+      myCustomChart.updateConfig(config);
       
       // Transforming data
       const measure_name = config.area_measure || queryResponse.fields.measures[0].name;
