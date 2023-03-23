@@ -232,7 +232,10 @@ looker.plugins.visualizations.add({
       // Creating options from data
       var options = create_dynamic_options(queryResponse);
       this.trigger('registerOptions', options);
+      
+      // Updating config
       update_config_options(options, config);
+      LookerCharts.updateConfig(config);
       
       // Transforming data
       const measure_name = config.area_measure || queryResponse.fields.measures[0].name;
