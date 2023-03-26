@@ -238,7 +238,7 @@ looker.plugins.visualizations.add({
       
       // Updating config
       update_config_options(options, config);
-      myCustomChart.updateConfig(config);
+      this.trigger('updateConfig', config);
       
       // Transforming data
       const measure_name = config.area_measure || queryResponse.fields.measures[0].name;
