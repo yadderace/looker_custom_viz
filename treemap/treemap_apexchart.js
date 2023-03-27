@@ -2,11 +2,9 @@ var IS_MULTIDIMENSIONAL = false;
 
 const DIV_ID = 'chart';
 
-var myCustomChart = null;
-
 
 const validate_errors = function(queryResponse){
-  
+
   var result = {
     error: false,
     title: null,
@@ -46,17 +44,17 @@ const validate_errors = function(queryResponse){
 
 
 const transform_data_to_treemap = function (data, measure_name, dimension_color, dimension_label){
-  
+
   var series = {};
   data.forEach(row => {
-    
+
     var dim_color_value = (dimension_label == null) ? 'null' : String(row[dimension_color].value);
     var data_point = {
       x: String(row[dimension_label || dimension_color].value),
       y: row[measure_name].value
     };
-    
-    if(!(dim_color_value in series)) {  
+
+    if(!(dim_color_value in series)) {
       series[dim_color_value] = {
         name: dim_color_value,
         data: [data_point]
@@ -65,7 +63,7 @@ const transform_data_to_treemap = function (data, measure_name, dimension_color,
     else{
       series[dim_color_value].data.push(data_point);
     }
-        
+
   });
 
   if(dimension_label == null) delete series['null'].name;
@@ -112,7 +110,7 @@ const create_fixed_options = function(){
 
 
 const create_dynamic_options = function(queryResponse){
-  
+
   var options = create_fixed_options();
 
   var no_hidden_dimensions = [];
@@ -128,7 +126,7 @@ const create_dynamic_options = function(queryResponse){
   queryResponse.fields.measures.forEach(function(measure){
     if(!measure.hidden){
       var obj = {};
-      obj[measure.label] = measure.name; 
+      obj[measure.label] = measure.name;
       no_hidden_measures.push(obj);
     }
   });
@@ -160,7 +158,7 @@ const create_dynamic_options = function(queryResponse){
     values: no_hidden_dimensions,
     default: Object.values(no_hidden_dimensions[0])[0]
   }
-  
+
   if(IS_MULTIDIMENSIONAL){
     options['subcategory_dimension'] = {
       label: 'Sub-Category Dimension',
@@ -181,7 +179,7 @@ const update_config_options = function(options, config){
   if( !'area_measure' in config || !'category_dimension' in config || (IS_MULTIDIMENSIONAL && !'subcategory_dimension' in config)) return;
 
   // If any of dimensions/measure selected in config is not available in options then it updates it to default.
-  
+
   if(!options.area_measure.values.flatMap(option => Object.values(option)).includes(config.area_measure)){
     config.area_measure = options.area_measure.default
   }
@@ -201,20 +199,19 @@ looker.plugins.visualizations.add({
     // form within the admin/visualizations page of Looker
     id: "treemap_apexcharts",
     label: "Treemap Apexcharts",
-    
+
     options: create_fixed_options(),
 
 
     // Set up the initial state of the visualization
     create: function(element, config) {
-  
+
         create_div(element);
-        myCustomChart = LookerCharts.createVisualization(element, config);
-  
+
     },
     // Render in response to the data or settings changing
     updateAsync: function(data, element, config, queryResponse, details, done) {
-  
+
       // Clear any errors from previous updates
       this.clearErrors();
       create_div(element);
@@ -235,11 +232,11 @@ looker.plugins.visualizations.add({
       // Creating options from data
       var options = create_dynamic_options(queryResponse);
       this.trigger('registerOptions', options);
-      
+
       // Updating config
       update_config_options(options, config);
       this.trigger('updateConfig', config);
-      
+
       // Transforming data
       const measure_name = config.area_measure || queryResponse.fields.measures[0].name;
       const dimension_color = config.category_dimension || queryResponse.fields.dimensions[0].name;
@@ -249,15 +246,15 @@ looker.plugins.visualizations.add({
 
       // Setting data and configuration for the chart
       var options = {
-        
+
         series: series_apexchart,
 
         colors: config.color_range,
-        
+
         legend: {
           show: config.show_legend
         },
-        
+
         chart: {
           height: element.offsetHeight,
           type: 'treemap',
