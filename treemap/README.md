@@ -31,10 +31,10 @@ You can create your treemap using two dimensions (Category and Sub-Category) and
 #### Show/Hide Legend
 You can show the legend ONLY when you create a Multidimensional treemap.
 
-### Fill Color As Stroke
+#### Fill Color As Stroke
 You can fill with color the spaces between areas.
 
-### Color Range
+#### Color Range
 You can select the range of color to use for the treemap.
 
 ---
