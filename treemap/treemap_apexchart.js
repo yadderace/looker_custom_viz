@@ -51,8 +51,11 @@ const transform_data_to_treemap = function (data, measure_name, dimension_color,
     var dim_color_value = (dimension_label == null) ? 'null' : String(row[dimension_color].value);
     var data_point = {
       x: String(row[dimension_label || dimension_color].value),
-      y: row[measure_name].value
+      y: row[measure_name].value,
+      links: null
     };
+
+    if(typeof row[measure_name].links != undefined) data_point.links = row[measure_name].links
 
     if(!(dim_color_value in series)) {
       series[dim_color_value] = {
@@ -193,6 +196,17 @@ const update_config_options = function(options, config){
   }
 }
 
+const on_click_chart = function(event, chartContext, config, lookerchart){
+  data = chartContext.w.globals.initialSeries[config.seriesIndex].data[config.dataPointIndex]
+  if(data.links != null){
+    lookerchart.Utils.openDrillMenu(
+      {
+        links: data.links,
+        event: event
+      }
+    );
+  }
+}
 looker.plugins.visualizations.add({
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
@@ -260,6 +274,9 @@ looker.plugins.visualizations.add({
           type: 'treemap',
           toolbar: {
             show: false
+          },
+          events: {
+            click: function(event, chartContext, config) { on_click_chart(event, chartContext, config, LookerCharts); }
           }
         },
 
