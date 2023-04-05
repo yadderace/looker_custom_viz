@@ -193,6 +193,17 @@ const update_config_options = function(options, config){
   }
 }
 
+const on_click_chart = function(event, chartContext, config, lookerchart){
+  console.log(event);
+  console.log(chartContext);
+  console.log(config);
+  lookerchart.Utils.openDrillMenu(
+    {
+      links: ['/explore/dwh_salesdesk/xplr_salesdesk_chats?fields=vw_fct_salesdesk_chats.ticket_id,vw_fct_salesdesk_chats.assistance_id,vw_fct_salesdesk_chats.workflow_id,vw_fct_salesdesk_chats.user_id,vw_fct_salesdesk_chats.status,vw_fct_salesdesk_chats.agent_id,vw_fct_salesdesk_chats.agent_name,vw_fct_salesdesk_chats.start_time,vw_fct_salesdesk_chats.assign_time,vw_fct_salesdesk_chats.accept_time,vw_fct_salesdesk_chats.first_time,vw_fct_salesdesk_chats.close_time,vw_fct_salesdesk_chats.first_response_duration_time,vw_fct_salesdesk_chats.wait_duration_time,vw_fct_salesdesk_chats.assist_duration_time&f[vw_fct_salesdesk_chats.agent_name]=Everaldo+Santos&f[vw_fct_salesdesk_chats.department_name]=Suporte+produtos+energia+solar&f[vw_fct_salesdesk_chats.start_date]=15+days&f[vw_dim_workflow.bot_id]=wdcnet-wa-ng-br&f[vw_fct_salesdesk_chats.assign_date]=-NULL&dynamic_fields=%5B%7B%22category%22%3A%22measure%22%2C%22expression%22%3Anull%2C%22label%22%3A%22Custom+Abandoned%22%2C%22value_format%22%3Anull%2C%22value_format_name%22%3Anull%2C%22based_on%22%3A%22vw_fct_salesdesk_chats.chat_abandoned%22%2C%22_kind_hint%22%3A%22measure%22%2C%22measure%22%3A%22custom_abandoned%22%2C%22type%22%3A%22count_distinct%22%2C%22_type_hint%22%3A%22number%22%7D%2C%7B%22category%22%3A%22table_calculation%22%2C%22label%22%3A%22%25%22%2C%22value_format%22%3Anull%2C%22value_format_name%22%3A%22percent_2%22%2C%22calculation_type%22%3A%22percent_of_column_sum%22%2C%22table_calculation%22%3A%22calculation%22%2C%22args%22%3A%5B%22vw_fct_salesdesk_chats.count%22%5D%2C%22_kind_hint%22%3A%22measure%22%2C%22_type_hint%22%3A%22number%22%2C%22is_disabled%22%3Atrue%7D%5D&query_timezone=America%2FLos_Angeles&limit=500'],
+      event: event
+    }
+  );
+}
 looker.plugins.visualizations.add({
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
@@ -260,6 +271,10 @@ looker.plugins.visualizations.add({
           type: 'treemap',
           toolbar: {
             show: false
+          },
+          events: {
+            click: function(event, chartContext, config) 
+              { on_click_chart(event, chartContext, config, LookerCharts); }
           }
         },
 
