@@ -243,8 +243,16 @@ looker.plugins.visualizations.add({
     // Set up the initial state of the visualization
     create: function(element, config) {
 
-        create_div(element);
+      // Create a style tag
+      var style = document.createElement('style');
+      style.innerHTML = `
+        @import url('https://unpkg.com/funnel-graph-js@1.3.9/dist/css/main.min.css');
+      `;
+      document.head.appendChild(style);
 
+      // Create a container element for the graph
+      this.container = element.appendChild(document.createElement("div"));
+      this.container.className = "funnel";
     },
 
     // Render in response to the data or settings changing

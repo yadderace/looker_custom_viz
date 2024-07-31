@@ -32,7 +32,5 @@ visualization: {
   id: "@{FUNNEL_D3_ID}}"
   file: "funnel_d3/funnel_d3.js"
   label: "@{FUNNEL_D3_LABEL}"
-  dependencies: ["https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/js/funnel-graph.min.js",
-    "https://unpkg.com/funnel-graph-js@1.3.9/dist/css/theme.min.css",
-    "https://unpkg.com/funnel-graph-js@1.3.9/dist/css/main.min.css"]
+  dependencies: ["https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/js/funnel-graph.min.js"]
 }
