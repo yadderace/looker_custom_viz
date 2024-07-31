@@ -75,43 +75,6 @@ const transform_data_to_treemap = function (data, measure_name, dimension_color,
 
 }
 
-
-const create_div = function(element){
-  element.innerHTML = "";
-  element.innerHTML = "<div id='" + DIV_ID + "' class='funnel'></div>";
-}
-
-
-const create_fixed_options = function(){
-  return {
-    show_legend: {
-      type: "boolean",
-      label: "Show Legend",
-      default: "false",
-      order: 1,
-      section: "Plot"
-    },
-
-    fill_color_as_stroke: {
-      type: "boolean",
-      label: "Fill Color As Stroke",
-      default: "false",
-      order: 2,
-      section: "Plot"
-    },
-
-    color_range: {
-      type: 'array',
-      label: 'Color Range',
-      display: 'colors',
-      order: 3,
-      default: ['#dd3333', '#80ce5d', '#f78131', '#369dc1', '#c572d3', '#36c1b3', '#b57052', '#ed69af'],
-      section: "Plot"
-    }
-  };
-}
-
-
 const create_dynamic_options = function(queryResponse){
 
   var options = create_fixed_options();
@@ -211,6 +174,25 @@ const on_click_chart = function(event, chartContext, config, lookerchart){
 
 // ================================================================
 
+const create_div = function(element){
+  element.innerHTML = "";
+
+  // Create a style tag
+  var style = document.createElement('style');
+  style.innerHTML = `@import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/funnel-graph.min.css');`;
+  document.head.appendChild(style);
+
+  // Create second style tag
+  var style2 = document.createElement('style');
+  style2.innerHTML = `@import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/main.css');`;
+
+  document.head.appendChild(style2);
+
+  // Create a container element for the graph
+  this.container = element.appendChild(document.createElement("div"));
+  this.container.className = "funnel";
+
+}
 
 const transorm_data_to_funnel = function(queryResponse, data, stages_field, measure_fields){
 
@@ -230,6 +212,55 @@ const transorm_data_to_funnel = function(queryResponse, data, stages_field, meas
     };
 }
 
+
+const create_fixed_options = function(){
+  return {
+    funnel_orientation: {
+      type: "string",
+      label: "Funnel Orientation",
+      display: "radio",
+      values: [
+        { "Vertical": "vertical" },
+        { "Horizontal": "horizontal" }
+      ],
+      default: "vertical",
+      section: "Plot"
+    },
+
+    show_percent: {
+      type: "boolean",
+      label: "Show Percents",
+      default: "true",
+      order: 2,
+      section: "Plot"
+    },
+
+    background_color: {
+      type: "string",
+      label: "Background Color",
+      display: "colors",
+      order: 3,
+      default: "#000000",
+      section: "Plot"
+    },
+
+    pct_mode: {
+      type: "string",
+      label: "Percentage Mode",
+      display: "radio",
+      values: [
+        { "Max": "max" },
+        { "Previous": "previous" },
+        { "First": "first" }
+      ],
+      default: "max",
+      section: "Data"
+    }
+
+
+  };
+}
+
 looker.plugins.visualizations.add({
     // Id and Label are legacy properties that no longer have any function besides documenting
     // what the visualization used to have. The properties are now set via the manifest
@@ -237,29 +268,12 @@ looker.plugins.visualizations.add({
     id: "funnel_d3",
     label: "Funnel D3",
 
-    //options: create_fixed_options(),
+    options: create_fixed_options(),
 
 
     // Set up the initial state of the visualization
     create: function(element, config) {
-
-      // Create a style tag
-      var style = document.createElement('style');
-      style.innerHTML = `
-        @import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/funnel-graph.min.css');
-      `;
-      document.head.appendChild(style);
-
-      // Create second style tag
-      var style2 = document.createElement('style');
-      style2.innerHTML = `
-        @import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/main.css');
-      `;
-      document.head.appendChild(style2);
-
-      // Create a container element for the graph
-      this.container = element.appendChild(document.createElement("div"));
-      this.container.className = "funnel";
+      create_div(element);
     },
 
     // Render in response to the data or settings changing
@@ -289,15 +303,15 @@ looker.plugins.visualizations.add({
       };
 
       const graph = new FunnelGraph({
-            container: '.funnel',
-        direction: 'vertical',
+        container: ".funnel",
+        direction: config.layout || "vertical",
 
-        gradientDirection: 'vertical',
+        gradientDirection: "vertical",
             data: dataExample3,
             displayPercent: true,
             width: 800,
             height: 300,
-            subLabelValue: 'raw',
+            subLabelValue: "raw",
             callbacks: {
                 click: (event, metadata) => {
                     console.log("click handler", metadata);
@@ -309,7 +323,7 @@ looker.plugins.visualizations.add({
             },
             margin: { top: 120, right: 60, bottom: 60, left: 60, text: 10 },
             responsive: true,
-            pctMode: 'first'
+            pctMode: config.pct_mode || "max"
       });
 
       graph.draw();
