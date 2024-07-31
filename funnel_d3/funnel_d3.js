@@ -246,9 +246,16 @@ looker.plugins.visualizations.add({
       // Create a style tag
       var style = document.createElement('style');
       style.innerHTML = `
-        @import url('https://unpkg.com/funnel-graph-js@1.3.9/dist/css/main.min.css');
+        @import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/funnel-graph.min.css');
       `;
       document.head.appendChild(style);
+
+      // Create second style tag
+      var style2 = document.createElement('style');
+      style2.innerHTML = `
+        @import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/main.css');
+      `;
+      document.head.appendChild(style2);
 
       // Create a container element for the graph
       this.container = element.appendChild(document.createElement("div"));
