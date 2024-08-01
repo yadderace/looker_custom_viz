@@ -224,6 +224,7 @@ const create_fixed_options = function(){
         { "Horizontal": "horizontal" }
       ],
       default: "vertical",
+      order: 1,
       section: "Plot"
     },
 
@@ -238,9 +239,36 @@ const create_fixed_options = function(){
     background_color: {
       type: "string",
       label: "Background Color",
-      display: "colors",
+      display: "color",
       order: 3,
+      default: "transparent",
+      section: "Plot"
+    },
+
+    label_color: {
+      type: "string",
+      label: "Value Color",
+      display: "color",
+      order: 4,
       default: "#000000",
+      section: "Plot"
+    },
+
+    title_color: {
+      type: "string",
+      label: "Title Color",
+      display: "color",
+      order: 5,
+      default: "#05df9d",
+      section: "Plot"
+    },
+
+    percentage_color: {
+      type: "string",
+      label: "Percentage Color",
+      display: "color",
+      order: 6,
+      default: "#9896dc",
       section: "Plot"
     },
 
@@ -291,7 +319,7 @@ looker.plugins.visualizations.add({
 
 
 
-      const dataExample3 = {
+      const funnel_viz_data = {
             labels: funnel_data.stages,
             subLabels: funnel_data.measures,
             colors: [
@@ -307,7 +335,7 @@ looker.plugins.visualizations.add({
         direction: config.layout || "vertical",
 
         gradientDirection: "vertical",
-            data: dataExample3,
+            data: funnel_viz_data,
             displayPercent: true,
             width: 800,
             height: 300,
@@ -323,7 +351,11 @@ looker.plugins.visualizations.add({
             },
             margin: { top: 120, right: 60, bottom: 60, left: 60, text: 10 },
             responsive: true,
-            pctMode: config.pct_mode || "max"
+            pctMode: config.pct_mode || "max",
+            backgroundColor: config.background_color || "transparent",
+            labelColor: config.label_color || "#000000",
+            titleColor: config.title_color || "#05df9d",
+            percentageColor: config.percentage_color || "#9896dc"
       });
 
       graph.draw();
