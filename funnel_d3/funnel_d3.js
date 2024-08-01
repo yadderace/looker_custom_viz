@@ -345,8 +345,8 @@ looker.plugins.visualizations.add({
       create_div(element);
 
       // Creating options
-      const options = create_fixed_options();
-      this.trigger('registerOptions', options);
+      //const options = create_fixed_options();
+      //this.trigger('registerOptions', options);
 
       // Transforming data
       const dimension_stages = queryResponse.fields.dimensions[0].name;
@@ -355,20 +355,20 @@ looker.plugins.visualizations.add({
       const funnel_data = transorm_data_to_funnel(queryResponse, data, dimension_stages, visible_measures);
 
       // Generating gradient colors
-      const colors = config.measures_colors;
-      const color_gradients = colors.map(color => generateGradients(color, funnel_data.measures.length));
+      //const colors = config.measures_colors;
+      //const color_gradients = colors.map(color => generateGradients(color, funnel_data.measures.length));
 
 
       const funnel_viz_data = {
             labels: funnel_data.stages,
             subLabels: funnel_data.measures,
-            colors: color_gradients,
+            // colors: color_gradients,
             values: funnel_data.values,
       };
 
       const graph = new FunnelGraph({
         container: ".funnel",
-        direction: config.layout || "vertical",
+        direction: config.funnel_orientation || "vertical",
 
         gradientDirection: "vertical",
             data: funnel_viz_data,
