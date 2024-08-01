@@ -268,7 +268,7 @@ const create_fixed_options = function(){
       label: "Measures Colors",
       display: "colors",
       order: 7,
-      default: function() { return LookerCharts.Utils.themeColors(); },
+      default: ["#dd3333", "#80ce5d", "#f78131", "#369dc1", "#c572d3", "#36c1b3", "#b57052", "#ed69af"],
       section: "Plot"
     },
 
