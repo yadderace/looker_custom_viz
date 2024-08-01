@@ -196,13 +196,13 @@ const create_div = function(element){
 
 const transorm_data_to_funnel = function(queryResponse, data, stages_field, measure_fields){
 
-  let stages = data.map(item => item[stages_field]?.value || null);
+  const stages = data.map(item => item[stages_field]?.value || null);
 
-  let measures = queryResponse.fields.measures
+  const measures = queryResponse.fields.measures
         .filter(measure => measure_fields.includes(measure.name))
         .map(measure => measure.label_from_parameter || measure.label_short);
 
-  let values = data.map(item =>
+  const values = data.map(item =>
         measure_fields.map(measure => item[measure]?.value || 0));
 
     return {
@@ -343,6 +343,10 @@ looker.plugins.visualizations.add({
       // Clear any errors from previous updates
       this.clearErrors();
       create_div(element);
+
+      // Creating options
+      const options = create_fixed_options();
+      this.trigger('registerOptions', options);
 
       // Transforming data
       const dimension_stages = queryResponse.fields.dimensions[0].name;
