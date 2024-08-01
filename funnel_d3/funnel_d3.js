@@ -212,7 +212,6 @@ const transorm_data_to_funnel = function(queryResponse, data, stages_field, meas
     };
 }
 
-
 const create_fixed_options = function(){
   return {
     funnel_orientation: {
@@ -225,14 +224,6 @@ const create_fixed_options = function(){
       ],
       default: "vertical",
       order: 1,
-      section: "Plot"
-    },
-
-    show_percent: {
-      type: "boolean",
-      label: "Show Percents",
-      default: "true",
-      order: 2,
       section: "Plot"
     },
 
@@ -272,6 +263,23 @@ const create_fixed_options = function(){
       section: "Plot"
     },
 
+    measures_colors: {
+      type: "array",
+      label: "Measures Colors",
+      display: "colors",
+      order: 7,
+      default: function() { return LookerCharts.Utils.themeColors(); },
+      section: "Plot"
+    },
+
+    show_percent: {
+      type: "boolean",
+      label: "Show Percents",
+      default: "true",
+      order: 1,
+      section: "Data"
+    },
+
     pct_mode: {
       type: "string",
       label: "Percentage Mode",
@@ -282,11 +290,36 @@ const create_fixed_options = function(){
         { "First": "first" }
       ],
       default: "max",
+      order: 2,
       section: "Data"
     }
 
 
   };
+}
+
+const generateGradients = function (color, gradients) {
+  // Helper function to lighten a color
+  function lightenColor(hex, factor) {
+    const lighten = (channel) => Math.min(255, Math.floor(channel + (255 - channel) * factor));
+    const r = lighten(parseInt(hex.substring(1, 3), 16));
+    const g = lighten(parseInt(hex.substring(3, 5), 16));
+    const b = lighten(parseInt(hex.substring(5, 7), 16));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  }
+
+  // Validate input
+  if (!/^#[0-9A-F]{6}$/i.test(color) || gradients < 1) {
+    return [color];
+  }
+
+  const result = [];
+  for (let i = 0; i < gradients; i++) {
+    const factor = i / (gradients - 1);
+    result.push(lightenColor(color, factor));
+  }
+
+  return result;
 }
 
 looker.plugins.visualizations.add({
@@ -317,16 +350,15 @@ looker.plugins.visualizations.add({
       const visible_measures = measures.filter(measure => !measure.hidden).map(measure => measure.name);
       const funnel_data = transorm_data_to_funnel(queryResponse, data, dimension_stages, visible_measures);
 
+      // Generating gradient colors
+      const colors = config.measures_colors || LookerCharts.Utils.themeColors();
+      const color_gradients = colors.map(color => generateGradients(color, funnel_data.measures.length));
 
 
       const funnel_viz_data = {
             labels: funnel_data.stages,
             subLabels: funnel_data.measures,
-            colors: [
-                ['#FFB178', '#FF78B1', '#FF3C8E'],
-                ['#A0BBFF', '#EC77FF'],
-                ['#A0F9FF', '#7795FF']
-            ],
+            colors: color_gradients,
             values: funnel_data.values,
       };
 
