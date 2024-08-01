@@ -351,7 +351,7 @@ looker.plugins.visualizations.add({
       const funnel_data = transorm_data_to_funnel(queryResponse, data, dimension_stages, visible_measures);
 
       // Generating gradient colors
-      const colors = config.measures_colors || LookerCharts.Utils.themeColors();
+      const colors = config.measures_colors;
       const color_gradients = colors.map(color => generateGradients(color, funnel_data.measures.length));
 
 
