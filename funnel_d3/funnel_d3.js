@@ -186,11 +186,11 @@ looker.plugins.visualizations.add({
       const funnel_data = transorm_data_to_funnel(queryResponse, data, dimension_stages, visible_measures);
 
       // Create the balanced array
-      const gradient_colors = new Array(measures.legth);
+      const gradient_colors = new Array(funnel_data.stages.legth);
 
       // Fill the array with hex1 and hex2
       for (let i = 0; i < measures.length; i++) {
-        gradient_colors[i] = [JSON.parse(config.measures_colors).color1, JSON.parse(config.measures_colors).color1];
+        gradient_colors[i] = [JSON.parse(config.measures_colors).color1, JSON.parse(config.measures_colors).color2];
       }
 
 
