@@ -65,10 +65,9 @@ const create_fixed_options = function(){
 
   // Convert JSON to Looker options, serializing the colors as strings
   const measure_color_options = color_options.map(option => {
-    return {
-      label: option.name,
-      value: JSON.stringify({color1: option.color1, color2: option.color2})
-    };
+    const obj = {};
+    obj[option.name] = JSON.stringify({color1: option.color1, color2: option.color2});
+    return obj;
   });
 
   return {
