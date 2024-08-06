@@ -174,22 +174,44 @@ const on_click_chart = function(event, chartContext, config, lookerchart){
 
 // ================================================================
 
+
+// Color Source: https://www.b3multimedia.ie/beautiful-color-gradients-for-your-next-design-project/
+const color_options = [
+  { "name": "Ocean Blue", "color1": "#2E3192", "color2": "#1BFFFF" },
+  { "name": "Sanguine", "color1": "#D4145A", "color2": "#FBB03B" },
+  { "name": "Luscious Lime", "color1": "#009245", "color2": "#FCEE21" },
+  { "name": "Purple Lake", "color1": "#662D8C", "color2": "#ED1E79" },
+  { "name": "Piglet", "color1": "#EE9CA7", "color2": "#FFDDE1" },
+  { "name": "Kashmir", "color1": "#614385", "color2": "#516395" },
+  { "name": "Green Beach", "color1": "#02AABD", "color2": "#00CDAC" },
+  { "name": "Bloody Mary", "color1": "#FF512F", "color2": "#DD2476" },
+  { "name": "Sweet Morning", "color1": "#FF5F6D", "color2": "#FFC371" },
+  { "name": "Quepal", "color1": "#11998E", "color2": "#38EF7D" }
+];
+
 const create_div = function(element){
   element.innerHTML = "";
 
-  // Create a style tag
+  // Create a style tag for the first import
   var style = document.createElement('style');
   style.innerHTML = `@import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/funnel-graph.min.css');`;
   document.head.appendChild(style);
 
-  // Create second style tag
+  // Create a style tag for the second import
   var style2 = document.createElement('style');
   style2.innerHTML = `@import url('https://cdn.jsdelivr.net/gh/yadderace/funnel-graph-js@feature/percentage-mode/dist/css/main.css');`;
-
   document.head.appendChild(style2);
 
-  // Create a container element for the graph
-  this.container = element.appendChild(document.createElement("div"));
+  // Create the outer container
+  const outerDiv = element.appendChild(document.createElement("div"));
+  outerDiv.style.width = "100%";
+
+  // Create the funnel wrapper div
+  const wrapperDiv = outerDiv.appendChild(document.createElement("div"));
+  wrapperDiv.className = "flex funnel-wrapper col";
+
+  // Create the funnel div
+  this.container = wrapperDiv.appendChild(document.createElement("div"));
   this.container.className = "funnel";
 
 }
@@ -263,12 +285,21 @@ const create_fixed_options = function(){
       section: "Plot"
     },
 
+    // Convert JSON to Looker options, serializing the colors as strings
+    const measure_color_options = color_options.map(option => {
+      return {
+        label: option.name,
+        value: JSON.stringify({color1: option.color1, color2: option.color2})
+      };
+    });
+
     measures_colors: {
-      type: "array",
+      type: "string",
       label: "Measures Colors",
-      display: "colors",
+      display: "select",
       order: 7,
-      default: ["#dd3333", "#80ce5d", "#f78131", "#369dc1", "#c572d3", "#36c1b3", "#b57052", "#ed69af"],
+      values: measure_color_options,
+      default: measure_color_options[0].value
       section: "Plot"
     },
 
@@ -298,29 +329,6 @@ const create_fixed_options = function(){
   };
 }
 
-const generateGradients = function (color, gradients) {
-  // Helper function to lighten a color
-  function lightenColor(hex, factor) {
-    const lighten = (channel) => Math.min(255, Math.floor(channel + (255 - channel) * factor));
-    const r = lighten(parseInt(hex.substring(1, 3), 16));
-    const g = lighten(parseInt(hex.substring(3, 5), 16));
-    const b = lighten(parseInt(hex.substring(5, 7), 16));
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-  }
-
-  // Validate input
-  if (!/^#[0-9A-F]{6}$/i.test(color) || gradients < 1) {
-    return [color];
-  }
-
-  const result = [];
-  for (let i = 0; i < gradients; i++) {
-    const factor = i / (gradients - 1);
-    result.push(lightenColor(color, factor));
-  }
-
-  return result;
-}
 
 looker.plugins.visualizations.add({
     // Id and Label are legacy properties that no longer have any function besides documenting
@@ -344,25 +352,26 @@ looker.plugins.visualizations.add({
       this.clearErrors();
       create_div(element);
 
-      // Creating options
-      //const options = create_fixed_options();
-      //this.trigger('registerOptions', options);
-
       // Transforming data
       const dimension_stages = queryResponse.fields.dimensions[0].name;
       const measures = queryResponse.fields.measures;
       const visible_measures = measures.filter(measure => !measure.hidden).map(measure => measure.name);
       const funnel_data = transorm_data_to_funnel(queryResponse, data, dimension_stages, visible_measures);
 
-      // Generating gradient colors
-      //const colors = config.measures_colors;
-      //const color_gradients = colors.map(color => generateGradients(color, funnel_data.measures.length));
+      // Create the balanced array
+      const gradient_colors = new Array(measures.legth);
+
+      // Fill the array with hex1 and hex2
+      for (let i = 0; i < measures.length; i++) {
+        gradient_colors[i] = [JSON.parse(config.measures_colors).color1, JSON.parse(config.measures_colors).color1];
+      }
+
 
 
       const funnel_viz_data = {
             labels: funnel_data.stages,
             subLabels: funnel_data.measures,
-            // colors: color_gradients,
+            colors: gradient_colors,
             values: funnel_data.values,
       };
 
@@ -371,7 +380,7 @@ looker.plugins.visualizations.add({
         direction: config.funnel_orientation || "vertical",
 
         gradientDirection: "vertical",
-            data: funnel_viz_data,
+        data: funnel_viz_data,
             displayPercent: true,
             width: 800,
             height: 300,
@@ -385,7 +394,7 @@ looker.plugins.visualizations.add({
                 //     console.log("tooltip handler", metadata);
                 // }
             },
-            margin: { top: 120, right: 60, bottom: 60, left: 60, text: 10 },
+            margin: { top: 10, right: 10, bottom: 10, left: 10, text: 10 },
             responsive: true,
             pctMode: config.pct_mode || "max",
             backgroundColor: config.background_color || "transparent",
