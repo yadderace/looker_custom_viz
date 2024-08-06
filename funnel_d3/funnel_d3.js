@@ -235,6 +235,15 @@ const transorm_data_to_funnel = function(queryResponse, data, stages_field, meas
 }
 
 const create_fixed_options = function(){
+
+  // Convert JSON to Looker options, serializing the colors as strings
+  const measure_color_options = color_options.map(option => {
+    return {
+      label: option.name,
+      value: JSON.stringify({color1: option.color1, color2: option.color2})
+    };
+  });
+
   return {
     funnel_orientation: {
       type: "string",
@@ -284,14 +293,6 @@ const create_fixed_options = function(){
       default: "#9896dc",
       section: "Plot"
     },
-
-    // Convert JSON to Looker options, serializing the colors as strings
-    const measure_color_options = color_options.map(option => {
-      return {
-        label: option.name,
-        value: JSON.stringify({color1: option.color1, color2: option.color2})
-      };
-    });
 
     measures_colors: {
       type: "string",
